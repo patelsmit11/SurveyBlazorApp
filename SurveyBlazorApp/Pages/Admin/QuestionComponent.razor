@@ -1,0 +1,64 @@
+﻿@page "/admin/question"
+@page "/admin/question/{questionid:int}"
+@attribute [Authorize(Roles = "Administrator")]
+
+<h5>Add a new Question</h5>
+<br />
+
+<EditForm Model="Question" OnValidSubmit="HandleValidSubmit">
+    <FluentValidationValidator />
+    <div class="row">
+        <div class="form-group col-1">
+            Question:
+        </div>
+        <div class="form-group col-auto">
+            <InputTextArea @bind-Value="Question.Title" cols="70" rows="1"></InputTextArea>
+            <ValidationMessage For="@(() => Question.Title)" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="form-group col-1">
+            Required:
+        </div>
+        <div class="form-group col-auto">
+            <InputCheckbox @bind-Value="Question.IsRequired"></InputCheckbox>
+        </div>
+    </div>
+    <div class="row">
+        <div class="form-group col-1">
+            Type:
+        </div>
+        <div class="form-group col-auto">
+            <InputSelect @bind-Value="Question.QuestionType">
+                @foreach (var value in Enum.GetValues(typeof(QuestionTypes)))
+                {
+                    <option>@value</option>
+                }
+            </InputSelect>
+        </div>
+    </div>
+    @if (Question.QuestionType != QuestionTypes.Text)
+    {
+        <div class="row">
+            <div class="form-group col-1">
+                Options:
+            </div>
+            <div class="form-group col-auto">
+                <InputTextArea @bind-Value="Question.Options" cols="70" rows="1"></InputTextArea>
+                <ValidationMessage For="@(() => Question.Options)" />
+
+            </div>
+            <div class="form-group col-3">
+                (Enter values as comma seperated)
+            </div>
+        </div>
+    }
+
+    <div class="row">
+        <div class="form-group col-1"></div>
+        <div class="form-group col-auto">
+            <button class="btn btn-success">Save</button>
+        </div>
+    </div>
+
+</EditForm>

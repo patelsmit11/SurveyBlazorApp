@@ -1,0 +1,89 @@
+﻿@page "/admin/survey/report"
+@attribute [Authorize(Roles = "Administrator")]
+
+@if (Questions == null)
+{
+    <div class="alert alert-info" role="alert">
+        <strong>Loading Survey Report!!!</strong> Please wait...
+    </div>
+}
+else if (Questions.Any())
+{
+    <h4>Survey Report</h4>
+    <hr />
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Question</th>
+                <th scope="col">Response</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                var counter = 1;
+            }
+            @foreach (var question in Questions.Where(t => t.QuestionType != QuestionTypes.Text))
+            {
+                <tr>
+                    <th scope="row">@counter</th>
+                    <td>@question.Title</td>
+                    <td>
+                        @foreach (var option in question.Options.Split(",", StringSplitOptions.TrimEntries))
+                        {
+                            <div class="row">
+                                <div class="col-6">
+                                    @option
+                                </div>
+                                <div class="col-auto">
+                                    <h3>
+                                        <span class="badge badge-primary">
+                                            @if (question.QuestionType == QuestionTypes.Single)
+                                            {
+                                                @question.SurveyResponses.Where(s => s.Value.ToLower().Equals(option.ToLower())).Count()
+                                            }
+                                            else if (question.QuestionType == QuestionTypes.Multi)
+                                            {
+                                                @question.SurveyResponses.Where(s => s.Value.ToLower().Split(",", StringSplitOptions.TrimEntries).Contains(option.ToLower())).Count()
+                                            }
+                                        </span>
+                                    </h3>
+                                </div>
+                            </div>
+                        }
+                    </td>
+                </tr>
+                counter++;
+            }
+        </tbody>
+    </table>
+
+    @foreach (var question in Questions.Where(t => t.QuestionType == QuestionTypes.Text))
+    {
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Question: @question.Title</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th scope="row">@counter</th>
+                    @foreach (var response in question.SurveyResponses)
+                    {
+                        <td scope="col" colspan="2">@response.Value</td>
+                    }
+                </tr>
+            </tbody>
+        </table>
+        counter++;
+    }
+}
+else
+{
+    <div class="alert alert-info" role="alert">
+        <strong>No Surveys Found!</strong>
+    </div>
+}

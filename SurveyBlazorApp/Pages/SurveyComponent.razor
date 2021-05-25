@@ -1,0 +1,76 @@
+﻿@page "/survey"
+@attribute [Authorize]
+
+@if (IsSurveyCompleted)
+{
+    <div class="alert alert-info" role="alert">
+        <strong>You have already completed the survery!</strong>
+    </div>
+    <a href="survey/completed" class="btn btn-primary">Completed Survey!</a>
+}
+else if (Questions == null)
+{
+    <div class="alert alert-info" role="alert">
+        <strong>Loading Survey!!!</strong> Please wait...
+    </div>
+}
+else if (Questions.Any())
+{
+    <h5>Please fill out the Survey. </h5>
+    <hr />
+
+    <EditForm Model="SurveyResponses" OnValidSubmit="HandleValidSubmit">
+        @*<FluentValidationValidator />*@
+
+        @{
+            var counter = 1;
+        }
+
+        @foreach (var question in Questions)
+        {
+            var surveyResponse = SurveyResponses.List.FirstOrDefault(s => s.QuestionId == question.QuestionId);
+
+            <div class="mb-4">
+                <b>
+                    <ValidationMessage For="@(() => surveyResponse.Value)" />
+                    @if (question.IsRequired)
+                    {
+                        <span>* </span>
+                    }
+                    @counter. @question.Title
+                </b>
+                <div class="mt-1">
+                    @if (question.QuestionType == QuestionTypes.Text)
+                    {
+                        <InputTextArea @bind-Value="surveyResponse.Value" cols="70"></InputTextArea>
+                    }
+                    else if (question.QuestionType == QuestionTypes.Single)
+                    {
+                        <InputRadioGroup @bind-Value="surveyResponse.Value">
+                            @foreach (var option in question.Options.Split(",", StringSplitOptions.TrimEntries))
+                            {
+                                <InputRadio Value="option" /> <span class="ml-1 mb-1">@option</span> <br />
+                            }
+                        </InputRadioGroup>
+                    }
+                    else if (question.QuestionType == QuestionTypes.Multi)
+                    {
+                        <CheckBoxList Data="@question.Options?.Split(",", StringSplitOptions.TrimEntries)"
+                                      TextField="@((item)=>item)"
+                                      ValueField="@((item)=>item)"
+                                      ValueChanged="@(item=> surveyResponse.Value = item)" />
+                    }
+                </div>
+            </div>
+            counter++;
+        }
+
+        <button class="btn btn-success">Submit</button>
+    </EditForm>
+}
+else
+{
+    <div class="alert alert-info" role="alert">
+        <strong>No Questions Found!</strong>
+    </div>
+}

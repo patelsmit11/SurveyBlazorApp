@@ -1,0 +1,59 @@
+﻿@page "/admin/survey/builder"
+@attribute [Authorize(Roles = "Administrator")]
+
+<h5>Welcome to the Survey Builder</h5>
+<a href="admin/question" class="btn btn-primary mt-3 mb-3">Add a new question</a>
+<br />
+
+@if (Questions == null)
+{
+    <div class="alert alert-info" role="alert">
+        <strong>Loading Survey!!!</strong> Please wait...
+    </div>
+}
+else if (Questions.Any())
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Question</th>
+                <th scope="col">Required</th>
+                <th scope="col">Type</th>
+                <th scope="col">Options</th>
+                <th scope="col" colspan="2" class="text-center">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                var counter = 1;
+            }
+            @foreach (var question in Questions)
+            {
+                <tr>
+                    <th scope="row">@counter</th>
+                    <td>@question.Title</td>
+                    <td>@(question.IsRequired ? "Yes" : "No")</td>
+                    <td>@question.QuestionType.ToString()</td>
+                    <td>@question.Options</td>
+                    <td>
+                        <a class="btn btn-outline-info" href="@($"admin/question/{question.QuestionId}")">Edit</a>
+                    </td>
+                    <td>
+                        <button class="btn btn-outline-danger" @onclick="@(() => DeleteClick(question.QuestionId))">Delete</button>
+                    </td>
+                </tr>
+                counter++;
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="alert alert-info" role="alert">
+        <strong>No Questions Found!</strong>
+    </div>
+}
+
+<DeleteConfirmBase @ref="DeleteConfirmation" ConfirmationChanged="ConfirmDeleteClick" ConfirmationMessage=@($"Are you sure you want to delete?")>
+</DeleteConfirmBase>

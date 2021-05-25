@@ -1,0 +1,20 @@
+﻿@typeparam TItem
+
+<div style=@Style>
+    @if (Data != null)
+    {
+        foreach (var item in Data)
+        {
+            var Text = TextField?.Invoke(item);
+            var Value = ValueField?.Invoke(item).ToString();
+            bool Checked = false;
+            if (SelectedValues.Contains(Value))
+            {
+                Checked = true;
+            }
+            <input type="checkbox" checked=@Checked @onchange="eventArgs => { CheckboxClicked(Value, eventArgs.Value); }" />
+            <span class="ml-1">@Text</span><br />
+        }
+    }
+    @ChildContent
+</div>

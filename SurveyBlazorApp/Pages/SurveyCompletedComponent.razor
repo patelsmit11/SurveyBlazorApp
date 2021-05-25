@@ -1,0 +1,30 @@
+﻿@page "/survey/completed"
+@attribute [Authorize]
+
+<div class="alert alert-success" role="alert">
+    <strong>Well done!</strong> Thank you for submitting our Survey!
+</div>
+
+<table class="table table-bordered mt-4">
+    <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Question</th>
+            <th scope="col">Response</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            var counter = 1;
+        }
+        @foreach (var surveyResponse in SurveyResponses)
+        {
+            <tr>
+                <th scope="row">@counter</th>
+                <td>@surveyResponse.Question.Title</td>
+                <td>@surveyResponse.Value</td>
+            </tr>
+            counter++;
+        }
+    </tbody>
+</table>
